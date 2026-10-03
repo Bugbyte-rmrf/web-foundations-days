@@ -6,6 +6,7 @@ let notes = [
   { id: 5, text: "Call mum", category: "personal" },
 ];
 
+// 1. searchNotes()
 function searchNotes(word) {
   return notes.filter((note) => {
      return note.text.toLowerCase().includes(word.toLowerCase());
@@ -18,6 +19,7 @@ console.log(searchNotes("javascript"));
 console.log(searchNotes("pizza"));
 // Expected: []
 
+// 2. longestNote()
 function longestNote() {
   if (notes.length === 0) {
     return null;
@@ -37,7 +39,15 @@ function longestNote() {
 console.log(longestNote());
 // Expected: { id: 3, text: "Email the project report to Grace", category: "work" }
 
+const savedNotesForLongest = notes;
+notes = [];
 
+console.log(longestNote());
+// Expected: null
+
+notes = savedNotesForLongest;
+
+// 3. countByCategory()
 function countByCategory() {
   const counts = {};
 
@@ -55,7 +65,7 @@ function countByCategory() {
 console.log(countByCategory());
 // Expected: { personal: 2, study: 2, work: 1 }
 
-
+// 4. getSummary()
 function getSummary() {
   const counts = countByCategory();
 
@@ -67,6 +77,16 @@ function getSummary() {
 console.log(getSummary());
 // Expected: "5 notes: 2 personal, 1 work, 2 study."
 
+const savedNotesForSummary = notes;
+notes = [savedNotesForSummary[0]];
+
+console.log(getSummary());
+// Expected: "1 note: 1 personal, 0 work, 0 study."
+
+notes = savedNotesForSummary;
+
+
+// 5. isDuplicate()
 function isDuplicate(text) {
   return notes.some((note) => {
     return note.text.trim().toLowerCase() === text.trim().toLowerCase();
@@ -79,6 +99,7 @@ console.log(isDuplicate("Buy milk and bread"));
 console.log(isDuplicate("  BUY MILK AND BREAD  "));
 // Expected: true
 
+// 6. addNote()
 function addNote(text, category) {
     if (text.length < 1 || text.length > 200) {
     console.log("Note text must be between 1 and 200 characters.");
@@ -99,7 +120,7 @@ if (!validCategories.includes(category)) {
 }
 
 const newNote = {
-  id: notes.length + 1,
+  id: notes.length > 0 ? Math.max(...notes.map(note => note.id)) + 1 : 1,
   text: text,
   category: category
 };
@@ -116,6 +137,9 @@ console.log(addNote("Plan weekend trip", "personal"));
 
 console.log(addNote("  PLAN WEEKEND TRIP  ", "personal"));
 // Expected: false
+
+const savedNotesForIdTest = notes;
+
 
 
 
