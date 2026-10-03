@@ -1,1 +1,0 @@
-# Web Foundations - Daily Assignments
