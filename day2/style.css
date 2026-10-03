@@ -1,0 +1,216 @@
+/* 1. Reset and base styles */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Segoe UI", Arial, sans-serif;
+  font-size: 16px;
+  background-color: #f4f6f8;
+  color: #222;
+  line-height: 1.5;
+}
+
+/* 2. Header */
+
+header {
+  background-color: #8e0000;
+  color: white;
+  text-align: center;
+  padding: 24px 16px;
+}
+
+header h1 {
+  margin: 0;
+}
+
+header p {
+  margin: 8px 0 16px;
+}
+
+/* 3. Navigation */
+
+nav {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+nav a:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+}
+
+/* 4. Main content and sections */
+
+main {
+  max-width: 640px;
+  margin: 24px auto;
+  padding: 0 16px;
+}
+
+section {
+  background-color: white;
+  padding: 20px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+/* 5. Features grid */
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.features li {
+  background-color: #fffbe6;
+  border-left: 4px solid #0ba184;
+  padding: 16px;
+  border-radius: 6px;
+}
+
+/* 6. Shortcuts table */
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  border: 1px solid #ccc;
+  padding: 10px;
+  text-align: left;
+}
+
+th {
+  background-color: #f0f2f4;
+}
+
+/* 7. Feedback form */
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+form label {
+  font-weight: bold;
+}
+
+form input,
+form textarea,
+form select {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font: inherit;
+}
+
+form textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+/* Note form on the home page */
+
+#note-form {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+#note-form label {
+  width: 100%;
+}
+
+#note-input {
+  flex: 1;
+}
+
+/* 8. Buttons */
+
+button {
+  background-color: #0ba184;
+  color: white;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+button:hover {
+  background-color: #088a70;
+  transform: translateY(-2px);
+}
+
+/* 9. Notes */
+
+#notes-list {
+  list-style: none;
+  padding: 0;
+}
+
+.note {
+  background-color: #fffbe6;
+  border-left: 4px solid #0ba184;
+  padding: 12px 16px;
+  margin-bottom: 10px;
+  border-radius: 6px;
+}
+
+/* 10. Footer */
+
+footer {
+  text-align: center;
+  color: #777;
+  padding: 16px;
+}
+
+/* 11. Small screens */
+
+@media (max-width: 600px) {
+  header {
+    padding: 16px 10px;
+  }
+
+  header h1 {
+    font-size: 1.8rem;
+  }
+
+  #note-form {
+    flex-direction: column;
+  }
+
+  #note-input {
+    width: 100%;
+  }
+
+  #note-form button {
+    width: 100%;
+  }
+}
+
+
