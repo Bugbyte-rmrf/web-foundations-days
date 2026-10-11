@@ -5,10 +5,10 @@ const filterInput = document.querySelector("#filter-input");
 const statusText = document.querySelector("#status");
 const usersList = document.querySelector("#users-list");
 
-// Store all fetched users here so filtering does not need another request.
+// Store all fetched users.
 let allUsers = [];
 
-// Create and display one user's information.
+// Display one user's information.
 function displayUser(user) {
   const li = document.createElement("li");
 
@@ -32,26 +32,11 @@ function displayUser(user) {
   usersList.appendChild(li);
 }
 
-// Display users whose names match the current filter.
-function renderUsers() {
-  const searchText = filterInput.value.trim().toLowerCase();
-
-  const filteredUsers = allUsers.filter((user) =>
-    user.name.toLowerCase().includes(searchText)
-  );
-
+// Render only the users provided to this function.
+function renderUsers(usersToDisplay) {
   usersList.replaceChildren();
 
-  filteredUsers.forEach(displayUser);
-
-  if (allUsers.length > 0) {
-    if (filteredUsers.length === 0) {
-      statusText.textContent = "No users match your search.";
-    } else {
-      statusText.textContent =
-        `Showing ${filteredUsers.length} of ${allUsers.length} users.`;
-    }
-  }
+  usersToDisplay.forEach(displayUser);
 }
 
 // Fetch users from the API.
@@ -71,7 +56,7 @@ async function loadUsers() {
     const users = await response.json();
 
     allUsers = users;
-    renderUsers();
+    renderUsers(allUsers);
 
     if (allUsers.length === 0) {
       statusText.textContent = "No users were found.";
@@ -91,9 +76,24 @@ async function loadUsers() {
 // Load users when the button is clicked.
 loadButton.addEventListener("click", loadUsers);
 
-// Filter the already-loaded users whenever the input changes.
+// Filter users when the input changes.
 filterInput.addEventListener("input", () => {
-  if (allUsers.length > 0) {
-    renderUsers();
+  if (allUsers.length === 0) {
+    return;
+  }
+
+  const searchText = filterInput.value.trim().toLowerCase();
+
+  const filteredUsers = allUsers.filter((user) =>
+    user.name.toLowerCase().includes(searchText)
+  );
+
+  renderUsers(filteredUsers);
+
+  if (filteredUsers.length === 0) {
+    statusText.textContent = "No users match your search.";
+  } else {
+    statusText.textContent =
+      `Showing ${filteredUsers.length} of ${allUsers.length} users.`;
   }
 });
