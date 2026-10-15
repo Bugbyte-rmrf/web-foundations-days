@@ -202,8 +202,3 @@ SnapShare has an estimated 1,000,000 daily active users, 11.6 average photo uplo
 
 Because the system is heavily read-biased (50:1), combining a CDN, Redis cache, and database read replicas serves feed requests efficiently. Object storage keeps large binary image files separate from relational database metadata, while a background queue and worker pool decouple thumbnail generation from upload latency. The architecture cleanly separates responsibilities to support scale while managing trade-offs around replication lag, eventual consistency, background processing delays, and operational complexity.
 
-
-
-
-
-
