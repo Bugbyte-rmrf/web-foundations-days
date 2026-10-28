@@ -93,61 +93,63 @@ Object storage is designed to store large unstructured binary files separately f
 
 ## 5. Text Architecture Diagram
 
-                           +-----------------------+
-                           |    Users / Clients    |
-                           |   Web or Mobile App   |
-                           +-----------+-----------+
-                                       |
-                         +-------------+-------------+
-                         |                           |
-                         v                           v
-                  +-------------+             +-------------+
-                  | CDN         |             | Load        |
-                  | Photos and  |             | Balancer    |
-                  | Thumbnails  |             +------+------+
-                  +------+------+                    |
-                         |                           v
-                         |                    +---------------+
-                         |                    | App Servers   |
-                         |                    | App 1, App 2  |
-                         |                    +-------+-------+
-                         |                            |
-                         |              +-------------+-------------+
-                         |              |             |             |
-                         |              v             v             v
-                         |         +---------+  +-----------+   +---------+
-                         |         | Cache   |  | Primary   |   | Queue   |
-                         |         | (Redis) |  | Database  |   | (Jobs)  |
-                         |         +---------+  +-----+-----+   +----+----+
-                         |                            |              |
-                         |                            v              v
-                         |                      +-----------+  +-----------+
-                         |                      | Read      |  | Thumbnail |
-                         |                      | Replica   |  | Worker    |
-                         |                      +-----------+  +-----+-----+
-                         |                                           |
-                         +---------------------+---------------------+
-                                               |
-                                               v
-                                     +----------------------+
-                                     | Object Storage (S3)  |
-                                     | Original Photos and  |
-                                     | Thumbnails           |
-                                     +----------------------+
-
+                         +----------------------+
+                         |   Users / Clients    |
+                         |  Web or Mobile App   |
+                         +----+------------+----+
+                              |            |
+                  API requests|            | Photo upload
+                              v            | using pre-signed URL
+                      +---------------+    |
+                      | Load Balancer |    |
+                      +-------+-------+    |
+                              |            |
+                              v            v
+                      +---------------+  +------------------+
+                      | App Servers   |  | Object Storage   |
+                      | (stateless)   |  | Original Photos  |
+                      +---+---+---+---+  +--------+---------+
+                          |   |   |               ^
+              +-----------+   |   +-------+       |
+              |               |           |       |
+              v               v           v       |
+        +-----------+  +-------------+  +---------+------+
+        | Redis     |  | Primary DB  |  | Job Queue      |
+        | Feed Cache|  | Metadata    |  | Thumbnail Jobs |
+        +-----------+  +------+------+  +--------+-------+
+                              |                    |
+                              v                    v
+                       +-------------+     +------------------+
+                       | Read Replica|     | Thumbnail Worker |
+                       | (read queries)    | Resize and save  |
+                       +-------------+     +--------+---------+
+                                                    |
+                                                    v
+                                           +------------------+
+                                           | Object Storage   |
+                                           | Originals +      |
+                                           | Thumbnails       |
+                                           +--------+---------+
+                                                    |
+                                                    v
+                                           +------------------+
+                                           | CDN              |
+                                           | Photo Delivery   |
+                                           +------------------+
 ### Diagram Flow Notes
-* Feed and upload-coordination API requests travel through the load balancer to a healthy app server.
-* App servers check the Redis cache for feed data and query the database read replica when needed.
-* Writes go to the primary database, and changes are replicated asynchronously to the read replica for suitable read queries.
-* The client uploads original photos directly to object storage using a restricted, short-lived pre-signed URL issued by the app server.
-* The app server sends thumbnail-generation jobs to the queue after the original upload succeeds.
-* The thumbnail worker reads the original photo from object storage, creates a 50 KB thumbnail, and saves it back to object storage.
-* The CDN serves cached photo files and thumbnails to users; on a cache miss, it retrieves the file from the object-storage origin.
+
+* API requests pass through the load balancer to a healthy app server.
+* The app servers validate uploads, issue restricted, short-lived pre-signed URLs, and coordinate photo metadata.
+* The client uploads original photos directly to object storage using the pre-signed URL, reducing binary-file traffic through the app servers.
+* Photo metadata is written to the primary database; suitable read queries use the read replica.
+* Feed data is cached in Redis to reduce database load.
+* The app server queues a thumbnail-generation job after the original upload and metadata are confirmed.
+* The thumbnail worker reads the original photo from object storage, creates a 50 KB thumbnail, and writes the thumbnail back to object storage.
+* The CDN delivers photos and thumbnails, fetching them from object storage on a cache miss.
 
 ---
 
 ## 6. Component Explanations
-
 * **CDN:** Delivers cached photos and thumbnails from edge locations closer to users, reducing latency and requests reaching the object-storage origin.
 * **Load balancer:** Distributes incoming API requests across healthy app servers to prevent any single server from becoming overloaded.
 * **App servers:** Handle authentication, feed requests, metadata, and upload coordination without relying on local session state.
